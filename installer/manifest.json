@@ -1,0 +1,17 @@
+{
+  "name": "DCCExpressHub",
+  "version": "development",
+  "new_install_prompt_erase": true,
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "improv": false,
+      "parts": [
+        {
+          "path": "development-placeholder.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}
