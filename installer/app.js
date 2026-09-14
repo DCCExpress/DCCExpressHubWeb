@@ -25,6 +25,7 @@
     browserWarning: $("browserWarning"),
 
     localFirmwareFile: $("localFirmwareFile"),
+    selectedFirmwareName: $("selectedFirmwareName"),
     localFirmwareWarning: $("localFirmwareWarning"),
     localFirmwareStatus: $("localFirmwareStatus"),
 
@@ -155,6 +156,10 @@
     const file =
       ui.localFirmwareFile
         .files?.[0];
+
+    ui.selectedFirmwareName.textContent =
+      file?.name ||
+      "No file selected";
 
     if (!file) {
       ui.localFirmwareStatus.textContent =

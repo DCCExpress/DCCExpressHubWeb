@@ -14,7 +14,7 @@
     src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module">
   </script>
 
-  <link rel="stylesheet" href="./styles.css?v=20260914-2" />
+  <link rel="stylesheet" href="./styles.css?v=20260914-3" />
 </head>
 <body>
   <main class="shell">
@@ -90,30 +90,52 @@
           hidden
         />
 
-        <label
-          for="localFirmwareFile"
-          class="firmware-file-button"
+        <div
           style="
-            display:inline-flex !important;
-            width:fit-content !important;
-            min-height:42px !important;
-            align-items:center !important;
-            justify-content:center !important;
-            padding:0.62rem 1rem !important;
-            border:1px solid #388bfd !important;
-            border-radius:7px !important;
-            background:#1f6feb !important;
-            background-color:#1f6feb !important;
-            color:#ffffff !important;
-            font-size:0.9rem !important;
-            font-weight:750 !important;
-            line-height:1 !important;
-            cursor:pointer !important;
-            box-shadow:none !important;
+            display:flex;
+            align-items:center;
+            gap:0.8rem;
+            flex-wrap:wrap;
           "
         >
-          Choose firmware file
-        </label>
+          <label
+            for="localFirmwareFile"
+            class="firmware-file-button"
+            style="
+              display:inline-flex !important;
+              width:fit-content !important;
+              min-height:42px !important;
+              align-items:center !important;
+              justify-content:center !important;
+              padding:0.62rem 1rem !important;
+              border:1px solid #388bfd !important;
+              border-radius:7px !important;
+              background:#1f6feb !important;
+              background-color:#1f6feb !important;
+              color:#ffffff !important;
+              font-size:0.9rem !important;
+              font-weight:750 !important;
+              line-height:1 !important;
+              cursor:pointer !important;
+              box-shadow:none !important;
+            "
+          >
+            Choose firmware file
+          </label>
+
+          <span
+            id="selectedFirmwareName"
+            style="
+              color:#c9d1d9;
+              font-size:0.9rem;
+              font-weight:600;
+              overflow-wrap:anywhere;
+              min-width:0;
+            "
+          >
+            No file selected
+          </span>
+        </div>
       </div>
 
       <div id="localFirmwareWarning" class="notice warning compact">
@@ -382,6 +404,6 @@
     </footer>
   </main>
 
-  <script src="./app.js"></script>
+  <script src="./app.js?v=20260914-3"></script>
 </body>
 </html>
