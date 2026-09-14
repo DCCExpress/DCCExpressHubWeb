@@ -9,7 +9,6 @@
   <meta name="theme-color" content="#0d1117" />
   <title>DCCExpressHub Web Installer & Serial Configurator</title>
 
-  <!-- Same installer technology already used by DCCExpressLite. -->
   <script
     type="module"
     src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module">
@@ -21,8 +20,13 @@
   <main class="shell">
     <header class="topbar">
       <div>
-        <p class="eyebrow"><a href="../" style="color:inherit;text-decoration:none">← DCCExpressHub</a> · SERVICE TOOL</p>
+        <p class="eyebrow">
+          <a href="../" style="color:inherit;text-decoration:none">← DCCExpressHub</a>
+          · SERVICE TOOL
+        </p>
+
         <h1>Web Installer & Serial Configurator</h1>
+
         <p class="muted">
           Install, recover, configure and diagnose DCCExpressHub directly from Chrome or Edge.
         </p>
@@ -38,66 +42,61 @@
       <div class="card-title-row">
         <div>
           <h2>Firmware installer</h2>
+
           <p class="muted small-copy">
-            Install an official DCC-EX release or flash a local merged BIN file.
-            No local helper server, Node.js, PlatformIO or esptool installation is required on this PC.
+            Download the correct merged firmware for your Hub hardware, then select that BIN file below.
+            The selected file is flashed directly from your computer; the installer does not download firmware itself.
           </p>
         </div>
-        <span class="badge badge-online">WEB INSTALLER</span>
+
+        <span class="badge badge-online">LOCAL BIN INSTALLER</span>
       </div>
 
-      <div class="install-source-tabs">
-        <button id="publishedTab" class="tab-button active" type="button">Published release</button>
-        <button id="localTab" class="tab-button" type="button">Local BIN file</button>
+      <div class="notice warning compact">
+        <strong>Before installation:</strong>
+        download the correct <code>*-merged.bin</code> firmware from the
+        <a
+          href="https://github.com/DCCExpress/DCCExpressHub/releases"
+          target="_blank"
+          rel="noopener noreferrer"
+        >DCCExpressHub Releases page</a>.
+        Do not flash firmware built for another Hub hardware target.
       </div>
 
-      <div id="publishedPanel">
-        <div class="form-grid">
-          <label>
-            Hardware
-            <select id="hardwareSelect">
-              <option value="m5stack-basic">M5Stack Basic</option>
-              <option value="esp32dev">ESP32 DevKit</option>
-            </select>
-          </label>
-
-          <label>
-            Firmware version
-            <select id="releaseSelect" disabled>
-              <option value="">Loading releases…</option>
-            </select>
-          </label>
-        </div>
-
-        <div class="field-help-block">
-          <strong>Select the exact Hub hardware before installing.</strong>
-          Both official targets use the ESP32 chip family, so the browser cannot
-          automatically distinguish an M5Stack Basic from a generic ESP32 DevKit.
-        </div>
-
-        <p id="releaseStatus" class="status-line muted">Loading release list…</p>
+      <div class="field-help-block">
+        <strong>Official firmware filenames:</strong><br />
+        M5Stack Basic:
+        <code>DCCExpressHub-M5Stack-Basic-DCCEX-v&lt;version&gt;-merged.bin</code><br />
+        ESP32 DevKit:
+        <code>DCCExpressHub-ESP32-DevKit-DCCEX-v&lt;version&gt;-merged.bin</code>
       </div>
 
-      <div id="localPanel" hidden>
-        <label>
-          Local merged BIN file
-          <input
-            id="localFirmwareFile"
-            type="file"
-            accept=".bin,application/octet-stream"
-          />
-        </label>
-
-        <div id="localFirmwareWarning" class="notice warning compact">
-          The selected file is installed as a complete merged DCCExpressHub image
-          at <code>0x000000</code>. A full install may erase existing Hub
-          configuration and stored layout data.
-        </div>
-
-        <p id="localFirmwareStatus" class="status-line muted">
-          Select a local firmware file to prepare the installer.
-        </p>
+      <div class="notice warning compact">
+        <strong>USB driver:</strong>
+        the Hub must appear in Windows as a serial / COM port.
+        If no COM port appears after connecting the device, install the USB-UART driver used by your board
+        (typically <strong>CH340/CH341</strong> or <strong>Silicon Labs CP210x</strong>)
+        and make sure the USB cable supports data transfer.
       </div>
+
+      <label>
+        Merged firmware BIN file
+        <input
+          id="localFirmwareFile"
+          type="file"
+          accept=".bin,application/octet-stream"
+        />
+      </label>
+
+      <div id="localFirmwareWarning" class="notice warning compact">
+        The selected file is installed as a complete merged DCCExpressHub image at
+        <code>0x000000</code>. A full install may erase existing Hub configuration
+        and stored layout data. Create a backup before flashing if needed.
+      </div>
+
+      <p id="localFirmwareStatus" class="status-line muted">
+        Select the downloaded DCCExpressHub merged BIN file.
+      </p>
 
       <esp-web-install-button
         id="installButton"
@@ -108,7 +107,7 @@
           slot="activate"
           type="button"
         >
-          Install firmware
+          Install selected firmware
         </button>
 
         <span slot="unsupported">
@@ -117,8 +116,8 @@
       </esp-web-install-button>
 
       <p class="muted small-copy">
-        The installer itself asks you to choose the Hub USB serial device.
-        There is no separate COM-port selector.
+        The installer asks you to choose the Hub USB serial device.
+        There is no separate COM-port selector on this page.
       </p>
     </section>
 
@@ -126,6 +125,7 @@
       <div class="card-title-row">
         <div>
           <h2>Serial configuration</h2>
+
           <p class="muted small-copy">
             Connect to the firmware at 115200 baud. If the Hub is rebooting or running an older
             firmware without the configuration protocol, the serial connection remains open in
@@ -175,6 +175,7 @@
     <section class="columns">
       <article class="card">
         <h2>Hub network</h2>
+
         <p class="muted small-copy">
           Network settings are stored in NVS and take effect after Hub restart.
         </p>
@@ -200,13 +201,14 @@
             <input
               id="hubHostname"
               autocomplete="off"
+              value="dccexpresshub"
               placeholder="dccexpresshub"
             />
           </label>
 
           <label>
             HTTP / WebSocket port
-            <input id="hubHttpPort" type="number" min="1" max="65535" />
+            <input id="hubHttpPort" type="number" min="1" max="65535" value="80" />
           </label>
         </div>
 
@@ -244,9 +246,9 @@
 
         <div class="field-help-block">
           <strong>Hub hostname:</strong>
-          enter only the hostname, for example <code>dccexpresshub</code>,
-          without <code>.local</code>. The Hub will then be reachable as
-          <code>dccexpresshub.local</code>.
+          the default hostname is <code>dccexpresshub</code> — without hyphens and without
+          <code>.local</code>. The default browser address is therefore
+          <code>http://dccexpresshub.local</code>.
         </div>
 
         <div class="button-row">
@@ -271,6 +273,7 @@
 
       <article class="card">
         <h2>EX-CSB1 connection</h2>
+
         <p class="muted small-copy">
           These values are stored in NVS and applied immediately.
         </p>
@@ -297,9 +300,11 @@
             <strong id="testTitle">Connection test</strong>
             <span id="testTime">—</span>
           </div>
+
           <div id="testMessage">
             Tests hostname resolution, TCP connection and a real DCC-EX &lt;#&gt; reply.
           </div>
+
           <code id="testReply">Reply: —</code>
         </div>
 
@@ -321,11 +326,13 @@
       <div class="card-title-row">
         <div>
           <h2>Serial console</h2>
+
           <p class="muted small-copy">
             Firmware logs and configuration responses appear here. Lines beginning with
             <code>&lt;</code> are sent as DCC-EX commands.
           </p>
         </div>
+
         <button id="clearConsoleButton" class="small" type="button">Clear</button>
       </div>
 
@@ -338,6 +345,7 @@
           placeholder="status  |  config  |  <s>  |  <t 18>"
           disabled
         />
+
         <button id="consoleSendButton" type="submit" disabled>Send</button>
       </form>
     </section>
@@ -347,11 +355,6 @@
     </footer>
   </main>
 
-  <!-- Keep the existing serial/configurator implementation untouched. -->
   <script src="./app.js"></script>
-
-  <!-- Target-aware published firmware selector. Loaded after app.js so it can
-       reuse the existing esp-web-tools button and source-tab behaviour. -->
-  <script src="./release-targets.js"></script>
 </body>
 </html>

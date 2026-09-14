@@ -3,11 +3,7 @@
 
   const RESPONSE_PREFIX = "@HUBCFG ";
   const BAUD_RATE = 115200;
-
-  const RELEASES_URL =
-    "https://api.github.com/repos/DCCExpress/DCCExpressHub/releases?per_page=30";
-
-  let publishedManifestUrl = null;
+  const DEFAULT_HUB_HOSTNAME = "dccexpresshub";
 
   let port = null;
   let reader = null;
@@ -17,7 +13,6 @@
   let protocolAvailable = false;
   let protocolBootstrapRunning = false;
 
-  let installerSource = "local";
   let localFirmwareUrl = null;
   let localManifestUrl = null;
 
@@ -27,185 +22,212 @@
     document.getElementById(id);
 
   const ui = {
-    browserWarning:
-      $("browserWarning"),
+    browserWarning: $("browserWarning"),
 
-    publishedTab:
-      $("publishedTab"),
+    localFirmwareFile: $("localFirmwareFile"),
+    localFirmwareWarning: $("localFirmwareWarning"),
+    localFirmwareStatus: $("localFirmwareStatus"),
 
-    localTab:
-      $("localTab"),
+    connectButton: $("connectButton"),
+    disconnectButton: $("disconnectButton"),
+    refreshStatusButton: $("refreshStatusButton"),
 
-    publishedPanel:
-      $("publishedPanel"),
+    statusWifi: $("statusWifi"),
+    statusIp: $("statusIp"),
+    statusHostname: $("statusHostname"),
+    statusHttp: $("statusHttp"),
+    statusRssi: $("statusRssi"),
+    statusHeap: $("statusHeap"),
 
-    localPanel:
-      $("localPanel"),
+    csbBadge: $("csbBadge"),
+    statusCsbHost: $("statusCsbHost"),
+    statusCsbResolved: $("statusCsbResolved"),
+    statusCsbPort: $("statusCsbPort"),
+    statusCsbState: $("statusCsbState"),
 
-    releaseSelect:
-      $("releaseSelect"),
+    wifiSsid: $("wifiSsid"),
+    wifiPassword: $("wifiPassword"),
+    hubHostname: $("hubHostname"),
+    hubHttpPort: $("hubHttpPort"),
 
-    releaseStatus:
-      $("releaseStatus"),
+    useDhcp: $("useDhcp"),
+    staticNetworkFields: $("staticNetworkFields"),
+    hubIp: $("hubIp"),
+    hubGateway: $("hubGateway"),
+    hubSubnet: $("hubSubnet"),
+    hubDns1: $("hubDns1"),
+    hubDns2: $("hubDns2"),
 
-    localFirmwareFile:
-      $("localFirmwareFile"),
+    openHubButton: $("openHubButton"),
+    saveNetworkButton: $("saveNetworkButton"),
+    saveNetworkRestartButton: $("saveNetworkRestartButton"),
 
-    localFirmwareWarning:
-      $("localFirmwareWarning"),
+    csbHost: $("csbHost"),
+    csbPort: $("csbPort"),
+    powerProg: $("powerProg"),
+    testCsbButton: $("testCsbButton"),
+    saveCsbButton: $("saveCsbButton"),
 
-    localFirmwareStatus:
-      $("localFirmwareStatus"),
+    testPanel: $("testPanel"),
+    testTitle: $("testTitle"),
+    testMessage: $("testMessage"),
+    testReply: $("testReply"),
+    testTime: $("testTime"),
 
-    connectButton:
-      $("connectButton"),
-
-    disconnectButton:
-      $("disconnectButton"),
-
-    refreshStatusButton:
-      $("refreshStatusButton"),
-
-    statusWifi:
-      $("statusWifi"),
-
-    statusIp:
-      $("statusIp"),
-
-    statusHostname:
-      $("statusHostname"),
-
-    statusHttp:
-      $("statusHttp"),
-
-    statusRssi:
-      $("statusRssi"),
-
-    statusHeap:
-      $("statusHeap"),
-
-    csbBadge:
-      $("csbBadge"),
-
-    statusCsbHost:
-      $("statusCsbHost"),
-
-    statusCsbResolved:
-      $("statusCsbResolved"),
-
-    statusCsbPort:
-      $("statusCsbPort"),
-
-    statusCsbState:
-      $("statusCsbState"),
-
-    wifiSsid:
-      $("wifiSsid"),
-
-    wifiPassword:
-      $("wifiPassword"),
-
-    hubHostname:
-      $("hubHostname"),
-
-    hubHttpPort:
-      $("hubHttpPort"),
-
-    useDhcp:
-      $("useDhcp"),
-
-    staticNetworkFields:
-      $("staticNetworkFields"),
-
-    hubIp:
-      $("hubIp"),
-
-    hubGateway:
-      $("hubGateway"),
-
-    hubSubnet:
-      $("hubSubnet"),
-
-    hubDns1:
-      $("hubDns1"),
-
-    hubDns2:
-      $("hubDns2"),
-
-    openHubButton:
-      $("openHubButton"),
-
-    saveNetworkButton:
-      $("saveNetworkButton"),
-
-    saveNetworkRestartButton:
-      $("saveNetworkRestartButton"),
-
-    csbHost:
-      $("csbHost"),
-
-    csbPort:
-      $("csbPort"),
-
-    powerProg:
-      $("powerProg"),
-
-    testCsbButton:
-      $("testCsbButton"),
-
-    saveCsbButton:
-      $("saveCsbButton"),
-
-    testPanel:
-      $("testPanel"),
-
-    testTitle:
-      $("testTitle"),
-
-    testMessage:
-      $("testMessage"),
-
-    testReply:
-      $("testReply"),
-
-    testTime:
-      $("testTime"),
-
-    consoleOutput:
-      $("consoleOutput"),
-
-    consoleForm:
-      $("consoleForm"),
-
-    consoleInput:
-      $("consoleInput"),
-
-    consoleSendButton:
-      $("consoleSendButton"),
-
-    clearConsoleButton:
-      $("clearConsoleButton"),
+    consoleOutput: $("consoleOutput"),
+    consoleForm: $("consoleForm"),
+    consoleInput: $("consoleInput"),
+    consoleSendButton: $("consoleSendButton"),
+    clearConsoleButton: $("clearConsoleButton"),
   };
 
   function getInstallButton() {
-    return document.getElementById(
-      "installButton",
-    );
+    return document.getElementById("installButton");
   }
 
-  function setInstallerEnabled(
-    enabled,
-  ) {
+  function setInstallerEnabled(enabled) {
     const activate =
       getInstallButton()
-        ?.querySelector(
-          '[slot="activate"]',
-        );
+        ?.querySelector('[slot="activate"]');
 
     if (activate) {
-      activate.disabled =
-        !enabled;
+      activate.disabled = !enabled;
     }
+  }
+
+  function setInstallManifest(manifestUrl) {
+    const oldButton = getInstallButton();
+
+    if (!oldButton) {
+      return;
+    }
+
+    const newButton =
+      oldButton.cloneNode(true);
+
+    newButton.setAttribute(
+      "manifest",
+      manifestUrl,
+    );
+
+    oldButton.replaceWith(newButton);
+  }
+
+  function revokeLocalFirmwareObjects() {
+    if (localManifestUrl) {
+      URL.revokeObjectURL(localManifestUrl);
+      localManifestUrl = null;
+    }
+
+    if (localFirmwareUrl) {
+      URL.revokeObjectURL(localFirmwareUrl);
+      localFirmwareUrl = null;
+    }
+  }
+
+  function detectOfficialFirmware(fileName) {
+    const name =
+      String(fileName ?? "");
+
+    if (
+      /^DCCExpressHub-M5Stack-Basic-DCCEX-v.+-merged\.bin$/i
+        .test(name)
+    ) {
+      return "M5Stack Basic";
+    }
+
+    if (
+      /^DCCExpressHub-ESP32-DevKit-DCCEX-v.+-merged\.bin$/i
+        .test(name)
+    ) {
+      return "ESP32 DevKit";
+    }
+
+    return null;
+  }
+
+  function prepareLocalFirmwareManifest() {
+    revokeLocalFirmwareObjects();
+
+    const file =
+      ui.localFirmwareFile
+        .files?.[0];
+
+    if (!file) {
+      ui.localFirmwareStatus.textContent =
+        "Select the downloaded DCCExpressHub merged BIN file.";
+
+      setInstallManifest("manifest.json");
+      setInstallerEnabled(false);
+      return;
+    }
+
+    if (
+      !file.name
+        .toLowerCase()
+        .endsWith(".bin")
+    ) {
+      ui.localFirmwareStatus.textContent =
+        "Invalid file. Select a .bin firmware image.";
+
+      setInstallManifest("manifest.json");
+      setInstallerEnabled(false);
+      return;
+    }
+
+    const target =
+      detectOfficialFirmware(file.name);
+
+    localFirmwareUrl =
+      URL.createObjectURL(file);
+
+    const manifest = {
+      name:
+        target
+          ? `DCCExpressHub — ${target}`
+          : "DCCExpressHub local firmware",
+
+      version: "local",
+
+      new_install_prompt_erase: true,
+
+      builds: [
+        {
+          chipFamily: "ESP32",
+          improv: false,
+
+          parts: [
+            {
+              path: localFirmwareUrl,
+              offset: 0,
+            },
+          ],
+        },
+      ],
+    };
+
+    localManifestUrl =
+      URL.createObjectURL(
+        new Blob(
+          [JSON.stringify(manifest)],
+          {
+            type: "application/json",
+          },
+        ),
+      );
+
+    setInstallManifest(localManifestUrl);
+    setInstallerEnabled(true);
+
+    const sizeKb =
+      Math.round(
+        file.size / 1024,
+      );
+
+    ui.localFirmwareStatus.textContent =
+      target
+        ? `${file.name} · ${sizeKb} KB · ${target} · factory @ 0x000000`
+        : `${file.name} · ${sizeKb} KB · factory @ 0x000000 · WARNING: filename does not match an official DCCExpressHub merged firmware name; verify the hardware target before installing.`;
   }
 
   function appendConsole(
@@ -238,9 +260,7 @@
     );
   }
 
-  function setProtocolAvailable(
-    value,
-  ) {
+  function setProtocolAvailable(value) {
     protocolAvailable =
       Boolean(value);
 
@@ -286,9 +306,7 @@
       !connected;
   }
 
-  function setCsbBadge(
-    connected,
-  ) {
+  function setCsbBadge(connected) {
     ui.csbBadge.textContent =
       connected
         ? "ONLINE"
@@ -323,17 +341,10 @@
           : "test-idle",
     );
 
-    ui.testTitle.textContent =
-      title;
-
-    ui.testMessage.textContent =
-      message;
-
-    ui.testReply.textContent =
-      reply;
-
-    ui.testTime.textContent =
-      elapsed;
+    ui.testTitle.textContent = title;
+    ui.testMessage.textContent = message;
+    ui.testReply.textContent = reply;
+    ui.testTime.textContent = elapsed;
   }
 
   function toggleStaticFields() {
@@ -341,468 +352,7 @@
       ui.useDhcp.checked;
   }
 
-  function revokePublishedManifest() {
-    if (publishedManifestUrl) {
-      URL.revokeObjectURL(
-        publishedManifestUrl,
-      );
-
-      publishedManifestUrl = null;
-    }
-  }
-
-  function revokeLocalFirmwareObjects() {
-    if (localManifestUrl) {
-      URL.revokeObjectURL(
-        localManifestUrl,
-      );
-
-      localManifestUrl = null;
-    }
-
-    if (localFirmwareUrl) {
-      URL.revokeObjectURL(
-        localFirmwareUrl,
-      );
-
-      localFirmwareUrl = null;
-    }
-  }
-
-  function setInstallManifest(
-    manifestUrl,
-  ) {
-    const oldButton =
-      getInstallButton();
-
-    const newButton =
-      oldButton.cloneNode(true);
-
-    newButton.setAttribute(
-      "manifest",
-      manifestUrl,
-    );
-
-    oldButton.replaceWith(
-      newButton,
-    );
-  }
-
-  function preparePublishedReleaseManifest() {
-    revokePublishedManifest();
-
-    const selected =
-      ui.releaseSelect
-        .selectedOptions[0];
-
-    const assetUrl =
-      selected?.dataset
-        ?.assetUrl;
-
-    const version =
-      selected?.dataset
-        ?.version ||
-      selected?.value ||
-      "published";
-
-    if (!assetUrl) {
-      setInstallManifest(
-        "manifest.json",
-      );
-
-      setInstallerEnabled(
-        false,
-      );
-
-      return;
-    }
-
-    const manifest = {
-      name:
-        "DCCExpressHub",
-
-      version,
-
-      new_install_prompt_erase:
-        true,
-
-      builds: [
-        {
-          chipFamily:
-            "ESP32",
-
-          improv:
-            false,
-
-          parts: [
-            {
-              path:
-                assetUrl,
-
-              offset:
-                0,
-            },
-          ],
-        },
-      ],
-    };
-
-    publishedManifestUrl =
-      URL.createObjectURL(
-        new Blob(
-          [
-            JSON.stringify(
-              manifest,
-            ),
-          ],
-          {
-            type:
-              "application/json",
-          },
-        ),
-      );
-
-    setInstallManifest(
-      publishedManifestUrl,
-    );
-
-    setInstallerEnabled(
-      true,
-    );
-  }
-
-  function useInstallerSource(
-    source,
-  ) {
-    installerSource =
-      source;
-
-    const published =
-      source === "published";
-
-    ui.publishedPanel.hidden =
-      !published;
-
-    ui.localPanel.hidden =
-      published;
-
-    ui.publishedTab.classList.toggle(
-      "active",
-      published,
-    );
-
-    ui.localTab.classList.toggle(
-      "active",
-      !published,
-    );
-
-    if (published) {
-      preparePublishedReleaseManifest();
-    } else {
-      prepareLocalFirmwareManifest();
-    }
-  }
-
-  function prepareLocalFirmwareManifest() {
-    if (
-      installerSource !== "local"
-    ) {
-      return;
-    }
-
-    revokeLocalFirmwareObjects();
-
-    const file =
-      ui.localFirmwareFile
-        .files?.[0];
-
-    if (!file) {
-      ui.localFirmwareStatus.textContent =
-        "Select a local firmware file to prepare the installer.";
-
-      setInstallManifest(
-        "manifest.json",
-      );
-
-      setInstallerEnabled(
-        false,
-      );
-
-      return;
-    }
-
-    if (
-      !file.name
-        .toLowerCase()
-        .endsWith(".bin")
-    ) {
-      ui.localFirmwareStatus.textContent =
-        "Select a .bin firmware file.";
-
-      setInstallerEnabled(
-        false,
-      );
-
-      return;
-    }
-
-    const merged =
-      true;
-
-    localFirmwareUrl =
-      URL.createObjectURL(
-        file,
-      );
-
-    const manifest = {
-      name:
-        "DCCExpressHub local firmware",
-
-      version:
-        "local",
-
-      new_install_prompt_erase:
-        merged,
-
-      builds: [
-        {
-          chipFamily:
-            "ESP32",
-
-          improv:
-            false,
-
-          parts: [
-            {
-              path:
-                localFirmwareUrl,
-
-              offset:
-                0,
-            },
-          ],
-        },
-      ],
-    };
-
-    localManifestUrl =
-      URL.createObjectURL(
-        new Blob(
-          [
-            JSON.stringify(
-              manifest,
-            ),
-          ],
-          {
-            type:
-              "application/json",
-          },
-        ),
-      );
-
-    setInstallManifest(
-      localManifestUrl,
-    );
-
-    setInstallerEnabled(
-      true,
-    );
-
-    ui.localFirmwareStatus.textContent =
-      `${file.name} · ${Math.round(file.size / 1024)} KB · ${
-        merged
-          ? "factory @ 0x000000"
-          : "application @ 0x010000"
-      }`;
-  }
-
-  async function loadPublishedReleases() {
-    let releases = [];
-
-    try {
-      const response =
-        await fetch(
-          RELEASES_URL,
-          {
-            cache:
-              "no-store",
-          },
-        );
-
-      if (!response.ok) {
-        throw new Error(
-          `HTTP ${response.status}`,
-        );
-      }
-
-      const parsed =
-        await response.json();
-
-      if (Array.isArray(parsed)) {
-        releases =
-          parsed
-            .filter(
-              release =>
-                !release.draft,
-            )
-            .map(
-              release => {
-                const asset =
-                  Array.isArray(
-                    release.assets,
-                  )
-                    ? release.assets.find(
-                        item =>
-                          /^DCCExpressHub-.+-merged\.bin$/i
-                            .test(
-                              item.name,
-                            ),
-                      )
-                    : null;
-
-                return asset
-                  ? {
-                      tagName:
-                        release.tag_name,
-
-                      version:
-                        String(
-                          release.tag_name ||
-                          "",
-                        ).replace(
-                          /^v/i,
-                          "",
-                        ),
-
-                      prerelease:
-                        Boolean(
-                          release.prerelease,
-                        ),
-
-                      assetUrl:
-                        asset.browser_download_url,
-                    }
-                  : null;
-              },
-            )
-            .filter(
-              Boolean,
-            );
-      }
-    } catch (error) {
-      releases = [];
-
-      appendConsole(
-        `Published release lookup unavailable: ${
-          error instanceof Error
-            ? error.message
-            : String(error)
-        }`,
-        "WEB",
-      );
-    }
-
-    ui.releaseSelect.innerHTML =
-      "";
-
-    if (
-      releases.length === 0
-    ) {
-      const option =
-        document.createElement(
-          "option",
-        );
-
-      option.value =
-        "";
-
-      option.textContent =
-        "No published DCCExpressHub firmware yet";
-
-      ui.releaseSelect
-        .appendChild(
-          option,
-        );
-
-      ui.releaseSelect.disabled =
-        true;
-
-      ui.releaseStatus.textContent =
-        "No installable GitHub Release was found. Use Local BIN file during development.";
-
-      if (
-        installerSource ===
-        "published"
-      ) {
-        setInstallManifest(
-          "manifest.json",
-        );
-
-        setInstallerEnabled(
-          false,
-        );
-      }
-
-      return;
-    }
-
-    for (
-      const [index, release]
-      of releases.entries()
-    ) {
-      const option =
-        document.createElement(
-          "option",
-        );
-
-      option.value =
-        release.tagName;
-
-      option.dataset.assetUrl =
-        release.assetUrl;
-
-      option.dataset.version =
-        release.version;
-
-      option.textContent =
-        `${release.tagName}${
-          release.prerelease
-            ? " · test"
-            : " · stable"
-        }${
-          index === 0
-            ? " · latest"
-            : ""
-        }`;
-
-      ui.releaseSelect
-        .appendChild(
-          option,
-        );
-    }
-
-    ui.releaseSelect.disabled =
-      false;
-
-    const first =
-      ui.releaseSelect
-        .selectedOptions[0];
-
-    ui.releaseStatus.textContent =
-      first?.textContent ??
-      "";
-
-    if (
-      installerSource ===
-      "published"
-    ) {
-      preparePublishedReleaseManifest();
-    }
-  }
-
-  async function writeLine(
-    line,
-  ) {
+  async function writeLine(line) {
     if (!port?.writable) {
       throw new Error(
         "Serial port is not connected.",
@@ -820,9 +370,7 @@
             `${line}\n`,
           );
 
-      await writer.write(
-        bytes,
-      );
+      await writer.write(bytes);
     } finally {
       writer.releaseLock();
     }
@@ -841,11 +389,8 @@
       cmd,
     };
 
-    if (
-      data !== undefined
-    ) {
-      message.data =
-        data;
+    if (data !== undefined) {
+      message.data = data;
     }
 
     const promise =
@@ -857,9 +402,7 @@
           const timer =
             window.setTimeout(
               () => {
-                pending.delete(
-                  id,
-                );
+                pending.delete(id);
 
                 reject(
                   new Error(
@@ -882,9 +425,7 @@
       );
 
     await writeLine(
-      JSON.stringify(
-        message,
-      ),
+      JSON.stringify(message),
     );
 
     return promise;
@@ -898,8 +439,7 @@
       return;
     }
 
-    protocolBootstrapRunning =
-      true;
+    protocolBootstrapRunning = true;
 
     try {
       await Promise.all([
@@ -914,31 +454,22 @@
         "CONFIG ERROR",
       );
     } finally {
-      protocolBootstrapRunning =
-        false;
+      protocolBootstrapRunning = false;
     }
   }
 
-  function recognizeHubConfigProtocol(
-    message,
-  ) {
+  function recognizeHubConfigProtocol(message) {
     const wasAvailable =
       protocolAvailable;
 
     if (!wasAvailable) {
-      setProtocolAvailable(
-        true,
-      );
+      setProtocolAvailable(true);
 
       appendConsole(
         "HUBCFG protocol detected. Configuration controls enabled.",
         "CONFIG",
       );
 
-      // The initial hello can miss the ESP32 because opening USB serial may
-      // reset the board. Any later valid @HUBCFG frame is authoritative proof
-      // that the configuration protocol is alive, so enable the UI immediately
-      // and refresh all editable values/status in the background.
       window.setTimeout(
         () => {
           void bootstrapProtocolState();
@@ -947,9 +478,6 @@
       );
     }
 
-    // An unsolicited firmware ready frame is emitted after boot. Refresh again
-    // even when CONFIG MODE was already active because a reboot can change
-    // runtime network / CSB1 status.
     if (
       message?.type === "ready" &&
       wasAvailable
@@ -963,16 +491,12 @@
     }
   }
 
-  function handleProtocolLine(
-    jsonText,
-  ) {
+  function handleProtocolLine(jsonText) {
     let message;
 
     try {
       message =
-        JSON.parse(
-          jsonText,
-        );
+        JSON.parse(jsonText);
     } catch {
       appendConsole(
         jsonText,
@@ -983,44 +507,27 @@
     }
 
     appendConsole(
-      JSON.stringify(
-        message,
-      ),
+      JSON.stringify(message),
       "CFG",
     );
 
-    recognizeHubConfigProtocol(
-      message,
-    );
+    recognizeHubConfigProtocol(message);
 
     if (
       message.id !== undefined &&
-      pending.has(
-        message.id,
-      )
+      pending.has(message.id)
     ) {
       const entry =
-        pending.get(
-          message.id,
-        );
+        pending.get(message.id);
 
-      pending.delete(
-        message.id,
-      );
+      pending.delete(message.id);
 
-      clearTimeout(
-        entry.timer,
-      );
-
-      entry.resolve(
-        message,
-      );
+      clearTimeout(entry.timer);
+      entry.resolve(message);
     }
   }
 
-  function handleIncomingLine(
-    line,
-  ) {
+  function handleIncomingLine(line) {
     if (
       line.startsWith(
         RESPONSE_PREFIX,
@@ -1042,8 +549,7 @@
   }
 
   async function readLoop() {
-    readLoopRunning =
-      true;
+    readLoopRunning = true;
 
     try {
       while (
@@ -1058,9 +564,7 @@
           const decoder =
             new TextDecoder();
 
-          while (
-            readLoopRunning
-          ) {
+          while (readLoopRunning) {
             const {
               value,
               done,
@@ -1079,20 +583,15 @@
               decoder.decode(
                 value,
                 {
-                  stream:
-                    true,
+                  stream: true,
                 },
               );
 
             for (;;) {
               const newline =
-                lineBuffer.indexOf(
-                  "\n",
-                );
+                lineBuffer.indexOf("\n");
 
-              if (
-                newline < 0
-              ) {
+              if (newline < 0) {
                 break;
               }
 
@@ -1112,12 +611,8 @@
                   newline + 1,
                 );
 
-              if (
-                line.length > 0
-              ) {
-                handleIncomingLine(
-                  line,
-                );
+              if (line.length > 0) {
+                handleIncomingLine(line);
               }
             }
           }
@@ -1127,9 +622,7 @@
         }
       }
     } catch (error) {
-      if (
-        readLoopRunning
-      ) {
+      if (readLoopRunning) {
         appendConsole(
           error instanceof Error
             ? error.message
@@ -1138,19 +631,14 @@
         );
       }
     } finally {
-      readLoopRunning =
-        false;
+      readLoopRunning = false;
     }
   }
 
   async function negotiateHubProtocol() {
-    setProtocolAvailable(
-      false,
-    );
+    setProtocolAvailable(false);
 
-    await sleep(
-      700,
-    );
+    await sleep(700);
 
     for (
       let attempt = 1;
@@ -1170,9 +658,7 @@
           );
 
         if (hello?.ok) {
-          setProtocolAvailable(
-            true,
-          );
+          setProtocolAvailable(true);
 
           appendConsole(
             `HUBCFG protocol ready (attempt ${attempt}).`,
@@ -1184,12 +670,10 @@
           return true;
         }
       } catch {
-        // ESP32 may still be rebooting after opening the USB serial port.
+        // Opening the USB serial port can reset the ESP32.
       }
 
-      await sleep(
-        300,
-      );
+      await sleep(300);
     }
 
     appendConsole(
@@ -1197,20 +681,14 @@
       "RECOVERY",
     );
 
-    setProtocolAvailable(
-      false,
-    );
+    setProtocolAvailable(false);
 
     return false;
   }
 
   async function connectSerial() {
-    if (
-      !navigator.serial
-    ) {
-      ui.browserWarning.hidden =
-        false;
-
+    if (!navigator.serial) {
+      ui.browserWarning.hidden = false;
       return;
     }
 
@@ -1219,29 +697,21 @@
         .requestPort();
 
     await port.open({
-      baudRate:
-        BAUD_RATE,
+      baudRate: BAUD_RATE,
     });
 
     try {
       await port.setSignals({
-        dataTerminalReady:
-          false,
-
-        requestToSend:
-          false,
+        dataTerminalReady: false,
+        requestToSend: false,
       });
     } catch {
       // Optional on some USB-UART implementations.
     }
 
-    lineBuffer =
-      "";
+    lineBuffer = "";
 
-    setProtocolAvailable(
-      false,
-    );
-
+    setProtocolAvailable(false);
     updateControlAvailability();
 
     appendConsole(
@@ -1255,8 +725,7 @@
   }
 
   async function disconnectSerial() {
-    readLoopRunning =
-      false;
+    readLoopRunning = false;
 
     if (reader) {
       try {
@@ -1270,9 +739,7 @@
       const entry
       of pending.values()
     ) {
-      clearTimeout(
-        entry.timer,
-      );
+      clearTimeout(entry.timer);
 
       entry.reject(
         new Error(
@@ -1292,14 +759,9 @@
     }
 
     port = null;
+    protocolBootstrapRunning = false;
 
-    protocolBootstrapRunning =
-      false;
-
-    setProtocolAvailable(
-      false,
-    );
-
+    setProtocolAvailable(false);
     updateControlAvailability();
 
     appendConsole(
@@ -1308,37 +770,46 @@
     );
   }
 
-  function normalizeHubHostname(
-    value,
-  ) {
+  function normalizeHubHostname(value) {
     return String(
       value ?? "",
     )
       .trim()
+      .replace(
+        /^https?:\/\//i,
+        "",
+      )
+      .replace(
+        /\/.*$/,
+        "",
+      )
       .replace(
         /\.local\.?$/i,
         "",
       );
   }
 
+  function effectiveHubHostname(value) {
+    return (
+      normalizeHubHostname(value) ||
+      DEFAULT_HUB_HOSTNAME
+    );
+  }
+
   function getHubUrl() {
     const hostname =
-      normalizeHubHostname(
+      effectiveHubHostname(
         ui.hubHostname.value,
       );
 
-    if (!hostname) {
-      return "";
-    }
-
-    const port =
+    const httpPort =
       Number(
         ui.hubHttpPort.value,
       ) || 80;
 
-    return port === 80
+    return httpPort === 80
       ? `http://${hostname}.local`
-      : `http://${hostname}.local:${port}`;
+      : `http://${hostname}.local:${httpPort}`;
   }
 
   function updateHubOpenButton() {
@@ -1374,11 +845,9 @@
         ?.commandCenter ?? {};
 
     ui.wifiSsid.value =
-      network.ssid ??
-      "";
+      network.ssid ?? "";
 
-    ui.wifiPassword.value =
-      "";
+    ui.wifiPassword.value = "";
 
     ui.wifiPassword.placeholder =
       network.passwordStored
@@ -1386,48 +855,40 @@
         : "Wi-Fi password";
 
     ui.hubHostname.value =
-      normalizeHubHostname(
+      effectiveHubHostname(
         network.hostname,
       );
 
     ui.hubHttpPort.value =
       String(
-        network.httpPort ??
-        80,
+        network.httpPort ?? 80,
       );
 
     ui.useDhcp.checked =
-      network.dhcp !==
-      false;
+      network.dhcp !== false;
 
     ui.hubIp.value =
-      network.ip ??
-      "";
+      network.ip ?? "";
 
     ui.hubGateway.value =
-      network.gateway ??
-      "";
+      network.gateway ?? "";
 
     ui.hubSubnet.value =
       network.subnet ??
       "255.255.255.0";
 
     ui.hubDns1.value =
-      network.dns1 ??
-      "";
+      network.dns1 ?? "";
 
     ui.hubDns2.value =
-      network.dns2 ??
-      "";
+      network.dns2 ?? "";
 
     ui.csbHost.value =
-      csb.host ??
-      "";
+      csb.host ?? "";
 
     ui.csbPort.value =
       String(
-        csb.port ??
-        2560,
+        csb.port ?? 2560,
       );
 
     ui.powerProg.checked =
@@ -1452,8 +913,7 @@
     }
 
     const status =
-      response.status ??
-      {};
+      response.status ?? {};
 
     ui.statusWifi.textContent =
       status.wifiConnected
@@ -1464,12 +924,11 @@
         : "OFFLINE";
 
     ui.statusIp.textContent =
-      status.wifiIp ||
-      "—";
+      status.wifiIp || "—";
 
     ui.statusHostname.textContent =
       status.hubHostname ||
-      "—";
+      DEFAULT_HUB_HOSTNAME;
 
     ui.statusHttp.textContent =
       status.hubHttpPort
@@ -1491,16 +950,13 @@
         : "—";
 
     ui.statusCsbHost.textContent =
-      status.csbHost ||
-      "—";
+      status.csbHost || "—";
 
     ui.statusCsbResolved.textContent =
-      status.csbResolvedIp ||
-      "—";
+      status.csbResolvedIp || "—";
 
     ui.statusCsbPort.textContent =
-      status.csbPort ??
-      "—";
+      status.csbPort ?? "—";
 
     ui.statusCsbState.textContent =
       status.csbConnected
@@ -1521,7 +977,7 @@
           .trim(),
 
       hostname:
-        normalizeHubHostname(
+        effectiveHubHostname(
           ui.hubHostname.value,
         ),
 
@@ -1588,8 +1044,7 @@
       "CONFIG",
     );
 
-    ui.wifiPassword.value =
-      "";
+    ui.wifiPassword.value = "";
 
     if (restartAfter) {
       await request(
@@ -1688,9 +1143,7 @@
     );
   }
 
-  async function sendConsoleCommand(
-    raw,
-  ) {
+  async function sendConsoleCommand(raw) {
     const line =
       raw.trim();
 
@@ -1709,64 +1162,15 @@
       await request(
         "dcc",
         {
-          command:
-            line,
+          command: line,
         },
       );
 
       return;
     }
 
-    if (
-      line.startsWith("{")
-    ) {
-      await writeLine(
-        line,
-      );
-
-      return;
-    }
-
-    await writeLine(
-      line,
-    );
+    await writeLine(line);
   }
-
-  ui.publishedTab.addEventListener(
-    "click",
-    () =>
-      useInstallerSource(
-        "published",
-      ),
-  );
-
-  ui.localTab.addEventListener(
-    "click",
-    () =>
-      useInstallerSource(
-        "local",
-      ),
-  );
-
-  ui.releaseSelect.addEventListener(
-    "change",
-    () => {
-      const selected =
-        ui.releaseSelect
-          .selectedOptions[0];
-
-      ui.releaseStatus.textContent =
-        selected?.textContent ??
-        "";
-
-      if (
-        installerSource ===
-        "published"
-      ) {
-        preparePublishedReleaseManifest();
-      }
-    },
-  );
 
   ui.localFirmwareFile.addEventListener(
     "change",
@@ -1852,36 +1256,34 @@
   ui.saveNetworkButton.addEventListener(
     "click",
     () => {
-      saveNetwork(
-        false,
-      ).catch(
-        error => {
-          appendConsole(
-            error instanceof Error
-              ? error.message
-              : String(error),
-            "ERROR",
-          );
-        },
-      );
+      saveNetwork(false)
+        .catch(
+          error => {
+            appendConsole(
+              error instanceof Error
+                ? error.message
+                : String(error),
+              "ERROR",
+            );
+          },
+        );
     },
   );
 
   ui.saveNetworkRestartButton.addEventListener(
     "click",
     () => {
-      saveNetwork(
-        true,
-      ).catch(
-        error => {
-          appendConsole(
-            error instanceof Error
-              ? error.message
-              : String(error),
-            "ERROR",
-          );
-        },
-      );
+      saveNetwork(true)
+        .catch(
+          error => {
+            appendConsole(
+              error instanceof Error
+                ? error.message
+                : String(error),
+              "ERROR",
+            );
+          },
+        );
     },
   );
 
@@ -1925,8 +1327,7 @@
   ui.clearConsoleButton.addEventListener(
     "click",
     () => {
-      ui.consoleOutput.textContent =
-        "";
+      ui.consoleOutput.textContent = "";
     },
   );
 
@@ -1938,47 +1339,39 @@
       const value =
         ui.consoleInput.value;
 
-      ui.consoleInput.value =
-        "";
+      ui.consoleInput.value = "";
 
-      sendConsoleCommand(
-        value,
-      ).catch(
-        error => {
-          appendConsole(
-            error instanceof Error
-              ? error.message
-              : String(error),
-            "ERROR",
-          );
-        },
-      );
+      sendConsoleCommand(value)
+        .catch(
+          error => {
+            appendConsole(
+              error instanceof Error
+                ? error.message
+                : String(error),
+              "ERROR",
+            );
+          },
+        );
     },
   );
 
   window.addEventListener(
     "beforeunload",
-    () => {
-      revokeLocalFirmwareObjects();
-      revokePublishedManifest();
-    },
+    revokeLocalFirmwareObjects,
   );
 
-  if (
-    !navigator.serial
-  ) {
-    ui.browserWarning.hidden =
-      false;
-
-    ui.connectButton.disabled =
-      true;
+  if (!navigator.serial) {
+    ui.browserWarning.hidden = false;
+    ui.connectButton.disabled = true;
   }
+
+  ui.hubHostname.value =
+    effectiveHubHostname(
+      ui.hubHostname.value,
+    );
 
   toggleStaticFields();
   updateHubOpenButton();
   updateControlAvailability();
-  setInstallerEnabled(
-    false,
-  );
-  void loadPublishedReleases();
+  setInstallerEnabled(false);
 })();
