@@ -96,21 +96,24 @@
   }
 
   function setInstallManifest(manifestUrl) {
-    const oldButton = getInstallButton();
+    const button =
+      getInstallButton();
 
-    if (!oldButton) {
+    if (!button) {
       return;
     }
 
-    const newButton =
-      oldButton.cloneNode(true);
-
-    newButton.setAttribute(
-      "manifest",
-      manifestUrl,
-    );
-
-    oldButton.replaceWith(newButton);
+    if (manifestUrl) {
+      // ESP Web Tools officially supports dynamic manifests through
+      // the custom element's manifest property. Do not replace/clone
+      // the element and do not fall back to a static manifest.json.
+      button.manifest =
+        manifestUrl;
+    } else {
+      button.removeAttribute(
+        "manifest",
+      );
+    }
   }
 
   function revokeLocalFirmwareObjects() {
@@ -157,7 +160,7 @@
       ui.localFirmwareStatus.textContent =
         "Select the downloaded DCCExpressHub merged BIN file.";
 
-      setInstallManifest("manifest.json");
+      setInstallManifest(null);
       setInstallerEnabled(false);
       return;
     }
@@ -170,7 +173,7 @@
       ui.localFirmwareStatus.textContent =
         "Invalid file. Select a .bin firmware image.";
 
-      setInstallManifest("manifest.json");
+      setInstallManifest(null);
       setInstallerEnabled(false);
       return;
     }
