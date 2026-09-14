@@ -6,153 +6,95 @@
     name="viewport"
     content="width=device-width, initial-scale=1"
   />
-  <meta name="theme-color" content="#0d1117" />
-  <title>DCCExpressHub Web Installer & Serial Configurator</title>
+  <meta name="theme-color" content="#141517" />
+  <title>DCCExpressHub Installer</title>
 
   <script
     type="module"
     src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module">
   </script>
 
-  <link rel="stylesheet" href="./styles.css?v=20260914-3" />
+  <link rel="stylesheet" href="./styles.css?v=20260914-mantine1" />
 </head>
+
 <body>
-  <main class="shell">
-    <header class="topbar">
+  <main class="app-shell">
+    <header class="page-header">
       <div>
-        <p class="eyebrow">
-          <a href="../" style="color:inherit;text-decoration:none">← DCCExpressHub</a>
-          · SERVICE TOOL
-        </p>
-
-        <h1>Web Installer & Serial Configurator</h1>
-
-        <p class="muted">
-          Install, recover, configure and diagnose DCCExpressHub directly from Chrome or Edge.
+        <a class="brand-link" href="../">DCCExpressHub</a>
+        <h1>Installer & configuration</h1>
+        <p class="page-subtitle">
+          Flash firmware and configure your Hub over USB.
         </p>
       </div>
+
+      <a
+        class="ghost-link"
+        href="https://github.com/DCCExpress/DCCExpressHub/releases"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Firmware releases ↗
+      </a>
     </header>
 
-    <section id="browserWarning" class="notice warning" hidden>
-      This tool requires desktop Chrome or Microsoft Edge with Web Serial support.
-      GitHub Pages HTTPS is supported directly.
-    </section>
+    <div id="browserWarning" class="alert alert-warning" hidden>
+      Use desktop Chrome or Microsoft Edge. Web Serial is required.
+    </div>
 
-    <section class="card">
-      <div class="card-title-row">
+    <section class="panel installer-panel">
+      <div class="panel-heading">
         <div>
-          <h2>Firmware installer</h2>
-
-          <p class="muted small-copy">
-            Download the correct merged firmware for your Hub hardware, then select that BIN file below.
-            The selected file is flashed directly from your computer; the installer does not download firmware itself.
-          </p>
+          <div class="section-kicker">Firmware</div>
+          <h2>Install DCCExpressHub</h2>
         </div>
 
-        <span class="badge badge-online">LOCAL BIN INSTALLER</span>
+        <span class="pill pill-blue">LOCAL BIN</span>
       </div>
 
-      <div class="notice warning compact">
-        <strong>Before installation:</strong>
-        download the correct <code>*-merged.bin</code> firmware from the
-        <a
-          href="https://github.com/DCCExpress/DCCExpressHub/releases"
-          target="_blank"
-          rel="noopener noreferrer"
-        >DCCExpressHub Releases page</a>.
-        Do not flash firmware built for another Hub hardware target.
-      </div>
-
-      <div class="field-help-block">
-        <strong>Official firmware filenames:</strong><br />
-        M5Stack Basic:
-        <code>DCCExpressHub-M5Stack-Basic-DCCEX-v&lt;version&gt;-merged.bin</code><br />
-        ESP32 DevKit:
-        <code>DCCExpressHub-ESP32-DevKit-DCCEX-v&lt;version&gt;-merged.bin</code>
-      </div>
-
-      <div class="notice warning compact">
-        <strong>USB driver:</strong>
-        the Hub must appear in Windows as a serial / COM port.
-        If no COM port appears after connecting the device, install the USB-UART driver used by your board
-        (typically <strong>CH340/CH341</strong> or <strong>Silicon Labs CP210x</strong>)
-        and make sure the USB cable supports data transfer.
-      </div>
-
-      <div class="firmware-file-field">
-        <span class="firmware-file-label">Merged firmware BIN file</span>
+      <div class="firmware-picker">
+        <div class="firmware-picker-label">Merged firmware file</div>
 
         <input
           id="localFirmwareFile"
-          class="firmware-file-input"
+          class="visually-hidden"
           type="file"
           accept=".bin,application/octet-stream"
-          hidden
         />
 
-        <div
-          style="
-            display:flex;
-            align-items:center;
-            gap:0.8rem;
-            flex-wrap:wrap;
-          "
-        >
+        <div class="firmware-picker-row">
           <label
             for="localFirmwareFile"
-            class="firmware-file-button"
-            style="
-              display:inline-flex !important;
-              width:fit-content !important;
-              min-height:42px !important;
-              align-items:center !important;
-              justify-content:center !important;
-              padding:0.62rem 1rem !important;
-              border:1px solid #388bfd !important;
-              border-radius:7px !important;
-              background:#1f6feb !important;
-              background-color:#1f6feb !important;
-              color:#ffffff !important;
-              font-size:0.9rem !important;
-              font-weight:750 !important;
-              line-height:1 !important;
-              cursor:pointer !important;
-              box-shadow:none !important;
-            "
+            class="button button-blue file-button"
           >
-            Choose firmware file
+            Choose firmware
           </label>
 
-          <span
+          <div
             id="selectedFirmwareName"
-            style="
-              color:#c9d1d9;
-              font-size:0.9rem;
-              font-weight:600;
-              overflow-wrap:anywhere;
-              min-width:0;
-            "
+            class="selected-file"
+            title="No file selected"
           >
             No file selected
+          </div>
+        </div>
+
+        <div class="firmware-meta-row">
+          <span id="localFirmwareStatus" class="firmware-status">
+            Select a merged DCCExpressHub BIN file.
           </span>
+
+          <span class="firmware-offset">Flash offset 0x000000</span>
         </div>
       </div>
 
-      <div id="localFirmwareWarning" class="notice warning compact">
-        The selected file is installed as a complete merged DCCExpressHub image at
-        <code>0x000000</code>. A full install may erase existing Hub configuration
-        and stored layout data. Create a backup before flashing if needed.
+      <div id="localFirmwareWarning" class="compact-note">
+        A full merged image may erase stored Hub configuration.
       </div>
 
-      <p id="localFirmwareStatus" class="status-line muted">
-        Select the downloaded DCCExpressHub merged BIN file.
-      </p>
-
-      <esp-web-install-button
-        id="installButton"
-      >
+      <esp-web-install-button id="installButton">
         <button
-          class="install-action"
+          class="button button-blue install-button"
           slot="activate"
           type="button"
         >
@@ -160,39 +102,68 @@
         </button>
 
         <span slot="unsupported">
-          Web Serial is not supported by this browser. Use desktop Chrome or Edge.
+          Web Serial is not supported by this browser.
         </span>
       </esp-web-install-button>
 
-      <p class="muted small-copy">
-        The installer asks you to choose the Hub USB serial device.
-        There is no separate COM-port selector on this page.
-      </p>
-    </section>
+      <details class="help-details">
+        <summary>Firmware & USB help</summary>
 
-    <section class="card">
-      <div class="card-title-row">
-        <div>
-          <h2>Serial configuration</h2>
+        <div class="help-content">
+          <p>
+            Official filenames start with
+            <code>DCCExpressHub-M5Stack-Basic-DCCEX-</code> or
+            <code>DCCExpressHub-ESP32-DevKit-DCCEX-</code>.
+          </p>
 
-          <p class="muted small-copy">
-            Connect to the firmware at 115200 baud. If the Hub is rebooting or running an older
-            firmware without the configuration protocol, the serial connection remains open in
-            recovery mode instead of disconnecting.
+          <p>
+            If Windows shows no COM port, install the USB-UART driver used by
+            your board — usually CH340/CH341 or Silicon Labs CP210x.
           </p>
         </div>
+      </details>
+    </section>
 
-        <div class="button-row inline">
-          <button id="connectButton" class="primary" type="button">Connect Hub</button>
-          <button id="disconnectButton" type="button" disabled>Disconnect</button>
+    <section class="panel">
+      <div class="panel-heading serial-heading">
+        <div>
+          <div class="section-kicker">USB serial</div>
+          <h2>Hub connection</h2>
+        </div>
+
+        <div class="action-row">
+          <button
+            id="connectButton"
+            class="button button-blue"
+            type="button"
+          >
+            Connect Hub
+          </button>
+
+          <button
+            id="disconnectButton"
+            class="button button-default"
+            type="button"
+            disabled
+          >
+            Disconnect
+          </button>
         </div>
       </div>
 
-      <section class="status-grid">
-        <article class="subcard">
-          <div class="card-title-row">
+      <div class="status-grid">
+        <article class="status-card">
+          <div class="status-card-header">
             <h3>Hub</h3>
-            <button id="refreshStatusButton" class="small" type="button" disabled>Refresh</button>
+
+            <button
+              id="refreshStatusButton"
+              class="button button-subtle button-small"
+              type="button"
+              disabled
+            >
+              Refresh
+            </button>
           </div>
 
           <dl class="kv">
@@ -205,10 +176,10 @@
           </dl>
         </article>
 
-        <article class="subcard">
-          <div class="card-title-row">
-            <h3>EX-CSB1</h3>
-            <span id="csbBadge" class="badge badge-neutral">UNKNOWN</span>
+        <article class="status-card">
+          <div class="status-card-header">
+            <h3>DCC-EX</h3>
+            <span id="csbBadge" class="pill pill-muted">UNKNOWN</span>
           </div>
 
           <dl class="kv">
@@ -218,130 +189,154 @@
             <div><dt>State</dt><dd id="statusCsbState">—</dd></div>
           </dl>
         </article>
-      </section>
+      </div>
     </section>
 
-    <section class="columns">
-      <article class="card">
-        <h2>Hub network</h2>
-
-        <p class="muted small-copy">
-          Network settings are stored in NVS and take effect after Hub restart.
-        </p>
+    <section class="settings-grid">
+      <article class="panel settings-panel">
+        <div class="panel-heading compact-heading">
+          <div>
+            <div class="section-kicker">Network</div>
+            <h2>Hub settings</h2>
+          </div>
+        </div>
 
         <div class="form-grid">
-          <label>
-            Wi-Fi SSID
+          <label class="field">
+            <span>Wi-Fi SSID</span>
             <input id="wifiSsid" autocomplete="off" />
           </label>
 
-          <label>
-            Wi-Fi password
+          <label class="field">
+            <span>Wi-Fi password</span>
             <input
               id="wifiPassword"
               type="password"
               autocomplete="new-password"
-              placeholder="Leave blank to keep the stored password"
+              placeholder="Leave blank to keep stored password"
             />
           </label>
 
-          <label>
-            Hub hostname (without .local)
+          <label class="field">
+            <span>Hostname</span>
             <input
               id="hubHostname"
               autocomplete="off"
               value="dccexpresshub"
               placeholder="dccexpresshub"
             />
+            <small>http://dccexpresshub.local</small>
           </label>
 
-          <label>
-            HTTP / WebSocket port
-            <input id="hubHttpPort" type="number" min="1" max="65535" value="80" />
+          <label class="field">
+            <span>HTTP / WebSocket port</span>
+            <input
+              id="hubHttpPort"
+              type="number"
+              min="1"
+              max="65535"
+              value="80"
+            />
           </label>
         </div>
 
         <label class="switch-line">
           <input id="useDhcp" type="checkbox" checked />
-          <span>Use DHCP</span>
+          <span>
+            <strong>Use DHCP</strong>
+            <small>Recommended for most networks</small>
+          </span>
         </label>
 
-        <div id="staticNetworkFields" class="form-grid">
-          <label>
-            Static IP
+        <div id="staticNetworkFields" class="form-grid static-grid">
+          <label class="field">
+            <span>Static IP</span>
             <input id="hubIp" placeholder="192.168.1.132" />
           </label>
 
-          <label>
-            Gateway
+          <label class="field">
+            <span>Gateway</span>
             <input id="hubGateway" placeholder="192.168.1.1" />
           </label>
 
-          <label>
-            Subnet
+          <label class="field">
+            <span>Subnet</span>
             <input id="hubSubnet" placeholder="255.255.255.0" />
           </label>
 
-          <label>
-            DNS 1
+          <label class="field">
+            <span>DNS 1</span>
             <input id="hubDns1" placeholder="192.168.1.1" />
           </label>
 
-          <label>
-            DNS 2
+          <label class="field">
+            <span>DNS 2</span>
             <input id="hubDns2" placeholder="Optional" />
           </label>
         </div>
 
-        <div class="field-help-block">
-          <strong>Hub hostname:</strong>
-          the default hostname is <code>dccexpresshub</code> — without hyphens and without
-          <code>.local</code>. The default browser address is therefore
-          <code>http://dccexpresshub.local</code>.
-        </div>
-
-        <div class="button-row">
+        <div class="action-row panel-actions">
           <button
             id="openHubButton"
-            class="link-button"
+            class="button button-default link-button"
             type="button"
             disabled
           >
             Open Hub
           </button>
 
-          <button id="saveNetworkButton" class="primary" type="button" disabled>
-            Save network
+          <button
+            id="saveNetworkButton"
+            class="button button-default"
+            type="button"
+            disabled
+          >
+            Save
           </button>
 
-          <button id="saveNetworkRestartButton" type="button" disabled>
-            Save + restart Hub
+          <button
+            id="saveNetworkRestartButton"
+            class="button button-blue"
+            type="button"
+            disabled
+          >
+            Save & restart
           </button>
         </div>
       </article>
 
-      <article class="card">
-        <h2>EX-CSB1 connection</h2>
+      <article class="panel settings-panel">
+        <div class="panel-heading compact-heading">
+          <div>
+            <div class="section-kicker">Command station</div>
+            <h2>DCC-EX connection</h2>
+          </div>
+        </div>
 
-        <p class="muted small-copy">
-          These values are stored in NVS and applied immediately.
-        </p>
-
-        <div class="form-grid">
-          <label>
-            EX-CSB1 / DCC-EX host or IP
+        <div class="form-grid one-row-form">
+          <label class="field field-wide">
+            <span>Host or IP</span>
             <input id="csbHost" placeholder="dccex.local" />
           </label>
 
-          <label>
-            TCP port
-            <input id="csbPort" type="number" min="1" max="65535" value="2560" />
+          <label class="field port-field">
+            <span>Port</span>
+            <input
+              id="csbPort"
+              type="number"
+              min="1"
+              max="65535"
+              value="2560"
+            />
           </label>
         </div>
 
         <label class="switch-line">
           <input id="powerProg" type="checkbox" checked />
-          <span>POWER controls MAIN + PROG</span>
+          <span>
+            <strong>POWER controls MAIN + PROG</strong>
+            <small>Apply power commands to both tracks</small>
+          </span>
         </label>
 
         <div id="testPanel" class="test-panel test-idle">
@@ -351,38 +346,48 @@
           </div>
 
           <div id="testMessage">
-            Tests hostname resolution, TCP connection and a real DCC-EX &lt;#&gt; reply.
+            Resolve the host, connect over TCP and verify a DCC-EX reply.
           </div>
 
           <code id="testReply">Reply: —</code>
         </div>
 
-        <div class="field-help-block">
-          <strong>EX-CSB1 / DCC-EX address:</strong>
-          enter the complete address used to reach the command station.
-          For the DCC-EX mDNS hostname use <code>dccex.local</code>
-          (including <code>.local</code>), or enter its IP address.
-        </div>
+        <div class="action-row panel-actions">
+          <button
+            id="testCsbButton"
+            class="button button-default"
+            type="button"
+            disabled
+          >
+            Test connection
+          </button>
 
-        <div class="button-row">
-          <button id="testCsbButton" type="button" disabled>Test</button>
-          <button id="saveCsbButton" class="primary" type="button" disabled>Save CSB1</button>
+          <button
+            id="saveCsbButton"
+            class="button button-blue"
+            type="button"
+            disabled
+          >
+            Save DCC-EX
+          </button>
         </div>
       </article>
     </section>
 
-    <section class="card">
-      <div class="card-title-row">
+    <section class="panel console-panel">
+      <div class="panel-heading compact-heading">
         <div>
+          <div class="section-kicker">Diagnostics</div>
           <h2>Serial console</h2>
-
-          <p class="muted small-copy">
-            Firmware logs and configuration responses appear here. Lines beginning with
-            <code>&lt;</code> are sent as DCC-EX commands.
-          </p>
         </div>
 
-        <button id="clearConsoleButton" class="small" type="button">Clear</button>
+        <button
+          id="clearConsoleButton"
+          class="button button-subtle button-small"
+          type="button"
+        >
+          Clear
+        </button>
       </div>
 
       <pre id="consoleOutput" class="console-output"></pre>
@@ -395,15 +400,22 @@
           disabled
         />
 
-        <button id="consoleSendButton" type="submit" disabled>Send</button>
+        <button
+          id="consoleSendButton"
+          class="button button-blue"
+          type="submit"
+          disabled
+        >
+          Send
+        </button>
       </form>
     </section>
 
-    <footer>
-      DCCExpressHub Web Installer & Serial Configurator
+    <footer class="page-footer">
+      DCCExpressHub · Web Installer & Serial Configurator
     </footer>
   </main>
 
-  <script src="./app.js?v=20260914-3"></script>
+  <script src="./app.js?v=20260914-mantine1"></script>
 </body>
 </html>

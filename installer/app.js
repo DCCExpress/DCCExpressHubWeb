@@ -234,8 +234,8 @@
 
     ui.localFirmwareStatus.textContent =
       target
-        ? `${file.name} · ${sizeKb} KB · ${target} · factory @ 0x000000`
-        : `${file.name} · ${sizeKb} KB · factory @ 0x000000 · WARNING: filename does not match an official DCCExpressHub merged firmware name; verify the hardware target before installing.`;
+        ? `${target} · ${sizeKb} KB · ready to install`
+        : `${sizeKb} KB · unknown hardware target — verify the filename before installing.`;
   }
 
   function appendConsole(
