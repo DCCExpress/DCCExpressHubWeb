@@ -27,7 +27,6 @@
           Install, recover, configure and diagnose DCCExpressHub directly from Chrome or Edge.
         </p>
       </div>
-
     </header>
 
     <section id="browserWarning" class="notice warning" hidden>
@@ -40,7 +39,7 @@
         <div>
           <h2>Firmware installer</h2>
           <p class="muted small-copy">
-            Uses the same <code>esp-web-tools</code> installer model as DCCExpressLite.
+            Install an official DCC-EX release or flash a local merged BIN file.
             No local helper server, Node.js, PlatformIO or esptool installation is required on this PC.
           </p>
         </div>
@@ -48,22 +47,38 @@
       </div>
 
       <div class="install-source-tabs">
-        <button id="publishedTab" class="tab-button" type="button">Published release</button>
-        <button id="localTab" class="tab-button active" type="button">Local BIN file</button>
+        <button id="publishedTab" class="tab-button active" type="button">Published release</button>
+        <button id="localTab" class="tab-button" type="button">Local BIN file</button>
       </div>
 
-      <div id="publishedPanel" hidden>
-        <label>
-          Firmware release
-          <select id="releaseSelect" disabled>
-            <option value="">Loading releases…</option>
-          </select>
-        </label>
+      <div id="publishedPanel">
+        <div class="form-grid">
+          <label>
+            Hardware
+            <select id="hardwareSelect">
+              <option value="m5stack-basic">M5Stack Basic</option>
+              <option value="esp32dev">ESP32 DevKit</option>
+            </select>
+          </label>
+
+          <label>
+            Firmware version
+            <select id="releaseSelect" disabled>
+              <option value="">Loading releases…</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="field-help-block">
+          <strong>Select the exact Hub hardware before installing.</strong>
+          Both official targets use the ESP32 chip family, so the browser cannot
+          automatically distinguish an M5Stack Basic from a generic ESP32 DevKit.
+        </div>
 
         <p id="releaseStatus" class="status-line muted">Loading release list…</p>
       </div>
 
-      <div id="localPanel">
+      <div id="localPanel" hidden>
         <label>
           Local merged BIN file
           <input
@@ -332,6 +347,11 @@
     </footer>
   </main>
 
+  <!-- Keep the existing serial/configurator implementation untouched. -->
   <script src="./app.js"></script>
+
+  <!-- Target-aware published firmware selector. Loaded after app.js so it can
+       reuse the existing esp-web-tools button and source-tab behaviour. -->
+  <script src="./release-targets.js"></script>
 </body>
 </html>
