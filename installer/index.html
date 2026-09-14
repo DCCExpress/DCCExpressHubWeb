@@ -79,14 +79,23 @@
         and make sure the USB cable supports data transfer.
       </div>
 
-      <label>
-        Merged firmware BIN file
+      <div class="firmware-file-field">
+        <span class="firmware-file-label">Merged firmware BIN file</span>
+
         <input
           id="localFirmwareFile"
+          class="firmware-file-input"
           type="file"
           accept=".bin,application/octet-stream"
         />
-      </label>
+
+        <label
+          for="localFirmwareFile"
+          class="firmware-file-button"
+        >
+          Choose firmware file
+        </label>
+      </div>
 
       <div id="localFirmwareWarning" class="notice warning compact">
         The selected file is installed as a complete merged DCCExpressHub image at

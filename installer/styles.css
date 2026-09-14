@@ -79,30 +79,61 @@ select:focus {
   box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.14);
 }
 
-/* Make the native firmware file picker match the blue installer action. */
-input[type="file"] {
-  padding: 0.32rem;
-  cursor: pointer;
+
+.firmware-file-field {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 1rem;
 }
 
-input[type="file"]::file-selector-button {
-  margin-right: 0.75rem;
+.firmware-file-label {
+  color: #c9d1d9;
+  font-size: 0.84rem;
+}
+
+.firmware-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.firmware-file-button {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
   border: 1px solid #388bfd;
   border-radius: 7px;
   background: #1f6feb;
   color: #ffffff;
-  padding: 0.58rem 0.85rem;
-  font: inherit;
-  font-weight: 700;
+  padding: 0.58rem 0.95rem;
+  font-size: 0.9rem;
+  font-weight: 750;
+  line-height: 1;
   cursor: pointer;
+  user-select: none;
   transition:
     background 120ms ease,
-    border-color 120ms ease;
+    border-color 120ms ease,
+    transform 80ms ease;
 }
 
-input[type="file"]::file-selector-button:hover {
+.firmware-file-button:hover {
   background: #388bfd;
   border-color: #58a6ff;
+}
+
+.firmware-file-button:active {
+  transform: translateY(1px);
+}
+
+.firmware-file-input:focus-visible + .firmware-file-button {
+  outline: 2px solid #58a6ff;
+  outline-offset: 2px;
 }
 
 .shell {
