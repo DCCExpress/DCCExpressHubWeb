@@ -119,10 +119,10 @@ code {
   align-items: center;
   min-height: 38px;
   padding: 0 12px;
-  border: 1px solid var(--border);
+  border: 1px solid limegreen;
   border-radius: var(--radius-sm);
-  background: rgba(37, 38, 43, 0.72);
-  color: var(--text);
+  background: lime;
+  color: black;
   font-size: 13px;
   font-weight: 600;
   text-decoration: none;
@@ -133,8 +133,8 @@ code {
 }
 
 .ghost-link:hover {
-  background: var(--surface-3);
-  border-color: #4c4f56;
+  background: rgba(0, 255, 0, 0.802);
+  border-color: limegreen;
 }
 
 .panel {
