@@ -1,145 +1,39 @@
 # DCCExpressHubWeb
 
-Public website and browser-based service tool for DCCExpressHub.
+Public documentation website for **DCCExpressHub** (Windows/Linux model railway control).
 
 ## Website
 
-After GitHub Pages is enabled with **GitHub Actions** as the source:
-
-```text
 https://dccexpress.github.io/DCCExpressHubWeb/
-```
 
-The service tool is available at:
+## Guide
 
-```text
-https://dccexpress.github.io/DCCExpressHubWeb/installer/
-```
+The lightweight, responsive guide includes Hungarian, English and German with a language selector and browser-persisted preference.
 
-## Repository structure
+Main categories:
 
-```text
-.
-├── index.html
-├── 404.html
-├── assets/
-│   └── site.css
-├── installer/
-│   ├── index.html
-│   ├── app.js
-│   ├── styles.css
-│   └── manifest.json
-└── .github/
-    └── workflows/
-        └── deploy-pages.yml
-```
+- Basics and command stations
+- Windows and Linux
+- Layout editing and shortcuts
+- Layout elements and their properties
+- Manual locomotive, turnout and accessory control
+- Automatic/manual operating modes (details intentionally pending)
 
-## Local development
+## Structure
 
-Open this repository in VS Code and use the **Live Server** extension.
+- `index.html` – documentation homepage
+- `assets/site.css` – WhiteSmoke-based theme and responsive layout
+- `assets/guide.js` – categorized content in three languages
+- `404.html` – not found page
 
-Landing page:
+No build framework is required. Use a static local HTTP server to preview.
 
-```text
-index.html → Open with Live Server
-```
+## Historic serial installer
 
-Service tool:
+The old ESP32 installer and Web Serial configurator were removed from `main`; the complete earlier version is preserved in the `serial` branch.
 
-```text
-installer/index.html → Open with Live Server
-```
+https://github.com/DCCExpress/DCCExpressHubWeb/tree/serial
 
-The installer starts in **Local BIN file** mode.
+## Publishing
 
-Build a merged firmware in the DCCExpressHub firmware repository, then select:
-
-```text
-DCCExpressHub-m5stack-basic-merged.bin
-```
-
-as:
-
-```text
-Factory / merged image — offset 0x000000
-```
-
-## Published firmware
-
-This website does not store DCCExpressHub release binaries.
-
-When releases exist, the installer reads releases from:
-
-```text
-DCCExpress/DCCExpressHub
-```
-
-and finds assets matching:
-
-```text
-DCCExpressHub-*-merged.bin
-```
-
-The browser creates the ESP Web Tools manifest dynamically.
-
-So the responsibilities stay separate:
-
-```text
-DCCExpressHub
-  firmware source + GitHub Releases
-
-DCCExpressHubWeb
-  public website + installer + serial configurator
-```
-
-## Serial configurator
-
-The service tool talks directly to the Hub using Web Serial at 115200 baud.
-
-It supports:
-
-- Wi-Fi SSID/password
-- hostname
-- DHCP/static IPv4
-- gateway/subnet/DNS
-- Hub HTTP/WebSocket port
-- EX-CSB1 host and TCP port
-- POWER MAIN vs MAIN+PROG policy
-- EX-CSB1 DCC-EX connection test
-- serial/DCC-EX console
-
-If opening the serial port resets the ESP32 and the first handshake is missed,
-the page keeps the port connected. Any later valid:
-
-```text
-@HUBCFG {...}
-```
-
-frame enables CONFIG MODE automatically.
-
-## GitHub Pages deployment
-
-The site does **not** deploy on push.
-
-First configure:
-
-```text
-Repository
-→ Settings
-→ Pages
-→ Build and deployment
-→ Source
-→ GitHub Actions
-```
-
-Then publish manually:
-
-```text
-GitHub
-→ Actions
-→ Deploy DCCExpressHub website
-→ Run workflow
-```
-
-This workflow only publishes the website. It does not create firmware releases,
-tags or GitHub Releases.
+The repository's GitHub Pages workflow is manually triggered. Pushes to `main` do not automatically publish the site unless the workflow configuration is changed.
